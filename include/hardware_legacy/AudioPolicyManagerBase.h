@@ -129,6 +129,7 @@ protected:
             STRATEGY_MEDIA,
             STRATEGY_PHONE,
             STRATEGY_SONIFICATION,
+            STRATEGY_MEDIA_SONIFICATION,
             STRATEGY_DTMF,
             STRATEGY_ENFORCED_AUDIBLE,
             NUM_STRATEGIES
