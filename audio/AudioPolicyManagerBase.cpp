@@ -2036,11 +2036,6 @@ const AudioPolicyManagerBase::VolumeCurvePoint
         sSpeakerSonificationVolumeCurve, // DEVICE_CATEGORY_SPEAKER
         sDefaultVolumeCurve  // DEVICE_CATEGORY_EARPIECE
     },
-    {  // STRATEGY_MEDIA_SONIFICATION
-        sDefaultMediaVolumeCurve,        // DEVICE_CATEGORY_HEADSET
-        sSpeakerSonificationVolumeCurve, // DEVICE_CATEGORY_SPEAKER
-        sDefaultMediaVolumeCurve         // DEVICE_CATEGORY_EARPIECE
-    },
     {  // STRATEGY_DTMF
         sDefaultVolumeCurve, // DEVICE_CATEGORY_HEADSET
         sDefaultVolumeCurve, // DEVICE_CATEGORY_SPEAKER
