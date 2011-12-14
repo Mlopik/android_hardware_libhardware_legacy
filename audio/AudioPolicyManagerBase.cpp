@@ -1940,30 +1940,42 @@ AudioPolicyManagerBase::device_category AudioPolicyManagerBase::getDeviceCategor
 float AudioPolicyManagerBase::volIndexToAmpl(uint32_t device, const StreamDescriptor& streamDesc,
         int indexInUi)
 {
+    //LOGV ("getDeviceCatgory");
     device_category deviceCategory = getDeviceCategory(device);
+    //LOGV ("streamDesc.mVolumeCurve");
     const VolumeCurvePoint *curve = streamDesc.mVolumeCurve[deviceCategory];
 
+    assert(curve != 0);
+
     // the volume index in the UI is relative to the min and max volume indices for this stream type
+    //LOGV ("nbSteps");
     int nbSteps = 1 + curve[VOLMAX].mIndex -
             curve[VOLMIN].mIndex;
+    //LOGV ("volIdx");
     int volIdx = (nbSteps * (indexInUi - streamDesc.mIndexMin)) /
             (streamDesc.mIndexMax - streamDesc.mIndexMin);
 
     // find what part of the curve this index volume belongs to, or if it's out of bounds
     int segment = 0;
     if (volIdx < curve[VOLMIN].mIndex) {         // out of bounds
+        //LOGV ("if1");
         return 0.0f;
     } else if (volIdx < curve[VOLKNEE1].mIndex) {
+        //LOGV ("if2");
         segment = 0;
     } else if (volIdx < curve[VOLKNEE2].mIndex) {
+        //LOGV ("if3");
         segment = 1;
     } else if (volIdx <= curve[VOLMAX].mIndex) {
+        //LOGV ("if4");
         segment = 2;
     } else {                                                               // out of bounds
+        //LOGV ("if5");
         return 1.0f;
     }
 
     // linear interpolation in the attenuation table in dB
+    //LOGV ("decibels");
     float decibels = curve[segment].mDBAttenuation +
             ((float)(volIdx - curve[segment].mIndex)) *
                 ( (curve[segment+1].mDBAttenuation -
@@ -1971,6 +1983,7 @@ float AudioPolicyManagerBase::volIndexToAmpl(uint32_t device, const StreamDescri
                     ((float)(curve[segment+1].mIndex -
                             curve[segment].mIndex)) );
 
+    //LOGV ("ampl");
     float amplification = exp( decibels * 0.115129f); // exp( dB * ln(10) / 20 )
 
     LOGV("VOLUME vol index=[%d %d %d], dB=[%.1f %.1f %.1f] ampl=%.5f",
@@ -2023,6 +2036,11 @@ const AudioPolicyManagerBase::VolumeCurvePoint
         sSpeakerSonificationVolumeCurve, // DEVICE_CATEGORY_SPEAKER
         sDefaultVolumeCurve  // DEVICE_CATEGORY_EARPIECE
     },
+    {  // STRATEGY_MEDIA_SONIFICATION
+        sDefaultMediaVolumeCurve,        // DEVICE_CATEGORY_HEADSET
+        sSpeakerSonificationVolumeCurve, // DEVICE_CATEGORY_SPEAKER
+        sDefaultMediaVolumeCurve         // DEVICE_CATEGORY_EARPIECE
+    },
     {  // STRATEGY_DTMF
         sDefaultVolumeCurve, // DEVICE_CATEGORY_HEADSET
         sDefaultVolumeCurve, // DEVICE_CATEGORY_SPEAKER
@@ -2039,6 +2057,7 @@ void AudioPolicyManagerBase::initializeVolumeCurves()
 {
     for (int i = 0; i < AudioSystem::NUM_STREAM_TYPES; i++) {
         for (int j = 0; j < DEVICE_CATEGORY_CNT; j++) {
+            LOGV("setting stream[%d] curve[%d] to %p => %d", i, j, sVolumeProfiles[getStrategy((AudioSystem::stream_type)i)][j], getStrategy((AudioSystem::stream_type)i));
             mStreams[i].mVolumeCurve[j] =
                     sVolumeProfiles[getStrategy((AudioSystem::stream_type)i)][j];
         }
