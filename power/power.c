@@ -133,4 +133,3 @@ void release_dvfs_lock()
 {
 }
 #endif
-
